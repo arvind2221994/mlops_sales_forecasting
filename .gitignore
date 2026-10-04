@@ -16,6 +16,10 @@ env/
 # Local data (processed or raw large files)
 data/
 
+# Generated reports are intentionally versioned.
+!reports/model_comparison.csv
+!reports/model_training_summary.md
+
 # MLflow run data
 mlruns/
 # Local virtual environment
