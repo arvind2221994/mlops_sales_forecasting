@@ -15,7 +15,6 @@ env/
 
 # Local data (processed or raw large files)
 data/
-*.csv
 
 # MLflow run data
 mlruns/
