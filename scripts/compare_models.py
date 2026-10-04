@@ -6,6 +6,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 MODELS_DIR = PROJECT_ROOT / "models"
+REPORTS_DIR = PROJECT_ROOT / "reports"
 
 from dotenv import load_dotenv
 from huggingface_hub import HfApi, login
@@ -74,13 +75,41 @@ comparison_df = comparison_df.sort_values(by="RMSE", ascending=True)
 
 print("\n" + comparison_df.to_string(index=False))
 
-# Identify best model
 best_model_name = comparison_df.iloc[0]["Model"]
 print(
     f"\nFinal Best Model Selected: {best_model_name} (Lowest RMSE: {comparison_df.iloc[0]['RMSE']:.2f})"
 )
 
-# Register the overall best model
+REPORTS_DIR.mkdir(exist_ok=True)
+comparison_csv = REPORTS_DIR / "model_comparison.csv"
+comparison_report = REPORTS_DIR / "model_training_summary.md"
+comparison_df.to_csv(comparison_csv, index=False)
+
+report_lines = [
+    "# Automated Model Comparison",
+    "",
+    "| Rank | Model | RMSE | MAE | R2 |",
+    "|---:|---|---:|---:|---:|",
+]
+for rank, row in enumerate(comparison_df.itertuples(index=False), start=1):
+    report_lines.append(
+        f"| {rank} | {row.Model} | {row.RMSE:.6f} | "
+        f"{row.MAE:.6f} | {row.R2:.6f} |"
+    )
+report_lines.extend(
+    [
+        "",
+        "## Selected Model",
+        "",
+        f"**{best_model_name}** was selected because it achieved the lowest "
+        f"RMSE ({comparison_df.iloc[0]['RMSE']:.6f}).",
+        "",
+    ]
+)
+comparison_report.write_text("\n".join(report_lines), encoding="utf-8")
+print(f"Comparison CSV saved to: {comparison_csv}")
+print(f"Comparison report saved to: {comparison_report}")
+
 best_path = model_files[best_model_name]
 api = HfApi()
 api.create_repo(repo_id=BEST_MODEL_REPO, repo_type="model", exist_ok=True)
