@@ -1,0 +1,23 @@
+# Environment variables (SECRETS - DO NOT COMMIT)
+.env
+.env.*
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Local data (processed or raw large files)
+data/
+*.csv
+
+# MLflow run data
+mlruns/
+# Local virtual environment
+.venv-x64/
